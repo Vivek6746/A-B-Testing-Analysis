@@ -1,0 +1,34 @@
+import pandas as pd
+import numpy as np
+from scipy.stats import ttest_ind
+
+
+control_data = pd.read_csv('control_group_data.csv')
+treatment_data = pd.read_csv('treatment_group_data.csv')
+
+
+control_conversion_rate = control_data['converted'].mean()
+treatment_conversion_rate = treatment_data['converted'].mean()
+
+
+effect_size = (treatment_conversion_rate - control_conversion_rate) / control_conversion_rate
+
+t_stat, p_val = ttest_ind(control_data['converted'], treatment_data['converted'])
+
+
+confidence_interval = (effect_size - 1.96 * np.std(effect_size), effect_size + 1.96 * np.std(effect_size))
+print("Control Conversion Rate:", control_conversion_rate)
+print("Treatment Conversion Rate:", treatment_conversion_rate)
+print("Effect Size:", effect_size)
+print("p-value:", p_val)
+print("Confidence Interval:", confidence_interval)
+
+
+if p_val < 0.05:
+    print("The treatment had a statistically significant impact on the conversion rate.")
+    if effect_size > 0:
+        print("The treatment increased the conversion rate by", effect_size*100, "%.")
+    else:
+        print("The treatment decreased the conversion rate by", -effect_size*100, "%.")
+else:
+    print("The treatment did not have a statistically significant impact on the conversion rate.")
